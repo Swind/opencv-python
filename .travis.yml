@@ -21,31 +21,6 @@ cache:
 matrix:
   fast_finish: true
   include:
-  - os: osx
-    language: generic
-    osx_image: xcode8
-    env:
-    - MB_PYTHON_VERSION=3.5
-    - ENABLE_CONTRIB=1
-    - ENABLE_HEADLESS=0
-    - BDIST_PARAMS="-- -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.7"
-  - os: osx
-    language: generic
-    osx_image: xcode8
-    env:
-    - MB_PYTHON_VERSION=3.6
-    - ENABLE_CONTRIB=1
-    - ENABLE_HEADLESS=0
-    - BDIST_PARAMS="-- -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.7"
-  - os: osx
-    language: generic
-    osx_image: xcode8
-    env:
-    - MB_PYTHON_VERSION=3.7
-    - ENABLE_CONTRIB=1
-    - ENABLE_HEADLESS=0
-    - BDIST_PARAMS="-- -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.7"
-    - TEST_DEPENDS=numpy==1.14.5
   - os: linux
     env:
     - MB_PYTHON_VERSION=3.5
@@ -78,23 +53,7 @@ matrix:
     - ENABLE_HEADLESS=0
     cache:
       directories: "$HOME/.ccache"
-  - os: linux
-    env:
-    - MB_PYTHON_VERSION=3.7
-    - TEST_DEPENDS=numpy==1.14.5
-    - ENABLE_CONTRIB=1
-    - ENABLE_HEADLESS=0
-    cache:
-      directories: "$HOME/.ccache"
-  - os: linux
-    env:
-    - MB_PYTHON_VERSION=3.7
-    - PLAT=i686
-    - TEST_DEPENDS=numpy==1.14.5
-    - ENABLE_CONTRIB=1
-    - ENABLE_HEADLESS=0
-    cache:
-      directories: "$HOME/.ccache"
+
 before_install: "# Check out and prepare the source\nset -e\n# Multibuild doesn't
   have releases, so --depth would break eventually (see\n# https://superuser.com/questions/1240216/server-does-not-allow-request-for-unadvertised)\ngit
   submodule update --init multibuild\nsource multibuild/common_utils.sh\n# https://github.com/matthew-brett/multibuild/issues/116\nif
@@ -158,10 +117,12 @@ after_success: |
   else
       echo "Tag not set, deployment skipped."
   fi
+
 deploy:
   provider: releases
   api_key:
     secure: AtM2g/4gJz2ZR4z6+p9GOkUiBIQGKgpJvkq48CgAeTTjEX0CXxn5XSwat4U8Sxr2QEiWj7giRsZlwW8P5TyPXAZ/R7oy1/hsfHQPpz9PKfrKFRpchgWdqiKfyTJwcTcEgo5VIhWmsnvXhbaQZPRnvAhvZ0b3wHfx/ymbsoyD1oyLJMDWq+K8bPvXni+A+vzv+PsSM4kF+AscjSO3ntVs6lBu7PiXFuz9vmmUY7jDkty3GmPzKA1wav1WNvWklSfiiIZvtGU2wj9iUClhYMibzY9lH4fowG9R2m6L3NjtefFCS17XhANKh6iEm3jVVifMjRvThCuYorEC67HDK3RLVJgwGhGWC5Jbr4Xc7aFTgd7lIftHL/alNcmLmiOpGcle45Uc1sdih1e0r5kkoszUAH+QNBXlN10ayNIP/z8iLv6LgT0qj0RIxvqleAJKawohhPqIPNVeSd+v+Vn7l7zbiYtiiZy03a94nvh1IbXPi6p2QB2uGy1/+3B9eipPiA9yamQh5dx2qP4j30iFUh4kMU2KIPfu2w6es+P5/TCVEebZwD1KqERBlKOCAW4g5EGg4qO2AXKN7as7VBge6KITSUSJogc5GhMgyd0tclON60vLeLpEyVv/C2Sq24WDuS8uy9IFm0vs1pzkCmBxEpFxvOyh20eWkVIpOfVPs27U/l0=
+  file_glob: true
   file: "${TRAVIS_BUILD_DIR}/wheelhouse/opencv/*"
   on:
     repo: Swind/opencv-python
