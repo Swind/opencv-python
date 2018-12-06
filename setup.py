@@ -144,6 +144,9 @@ def main():
                                               # devtoolset-2 GCC 4.8.2 or vanilla GCC 4.9.4
                                               # see https://github.com/skvark/opencv-python/issues/138
 
+    # Enable nonfree  algorithms
+    cmake_args.append("-DOPENCV_ENABLE_NONFREE=ON")
+
     # ABI config variables are introduced in PEP 425
     if sys.version_info[:2] < (3, 2):
         import warnings
