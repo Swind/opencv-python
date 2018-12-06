@@ -117,7 +117,6 @@ after_success: |
   else
       echo "Tag not set, deployment skipped."
   fi
-
 deploy:
   provider: releases
   api_key:
@@ -126,4 +125,4 @@ deploy:
   file: "${TRAVIS_BUILD_DIR}/wheelhouse/opencv/*"
   on:
     repo: Swind/opencv-python
-    branch: nonfree
+    tags: true
