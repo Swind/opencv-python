@@ -6,18 +6,25 @@ env:
   - USE_CCACHE=1
   - PLAT=x86_64
   - UNICODE_WIDTH=32
+
 language: generic
+
 sudo: required
+
 services: docker
+
 dist: trusty
+
 git:
   submodules: false
+
 cache:
   directories:
   - "$HOME/Library/Caches/Homebrew"
   - "/usr/local/Homebrew/"
   - "$HOME/local_bottle_metadata"
   - "$HOME/.ccache"
+
 matrix:
   fast_finish: true
   include:
@@ -54,24 +61,47 @@ matrix:
     cache:
       directories: "$HOME/.ccache"
 
-before_install: "# Check out and prepare the source\nset -e\n# Multibuild doesn't
-  have releases, so --depth would break eventually (see\n# https://superuser.com/questions/1240216/server-does-not-allow-request-for-unadvertised)\ngit
-  submodule update --init multibuild\nsource multibuild/common_utils.sh\n# https://github.com/matthew-brett/multibuild/issues/116\nif
-  [[ \"$TRAVIS_OS_NAME\" == \"osx\" ]]; then export ARCH_FLAGS=\" \"; fi\nsource multibuild/travis_steps.sh\n#
-  This sets -x\nsource multibuild_customize.sh\necho $ENABLE_CONTRIB > contrib.enabled\necho
-  $ENABLE_HEADLESS > headless.enabled\n\nif [ -n \"$IS_OSX\" ]; then\n    TAPS=\"$(brew
-  --repository)/Library/Taps\"\n    if [ -e \"$TAPS/caskroom/homebrew-cask\" -a -e
-  \"$TAPS/homebrew/homebrew-cask\" ]; then\n        rm -rf \"$TAPS/caskroom/homebrew-cask\"\n
-  \   fi\n    find \"$TAPS\" -type d -name .git -exec \\\n            bash -xec '\n
-  \               cd $(dirname '\\''{}'\\'')\n                git clean -fxd\n                git
-  status' \\;\n                \n    brew_cache_cleanup\nfi\n\nbefore_install\n# Not
-  interested in travis internal scripts' output\nset +x\n"
+# The first line is printed in the folding header in Travis output
+before_install: |
+    # Check out and prepare the source
+    set -e
+    # Multibuild doesn't have releases, so --depth would break eventually (see
+    # https://superuser.com/questions/1240216/server-does-not-allow-request-for-unadvertised)
+    git submodule update --init multibuild
+    source multibuild/common_utils.sh
+    # https://github.com/matthew-brett/multibuild/issues/116
+    if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export ARCH_FLAGS=" "; fi
+    source multibuild/travis_steps.sh
+    # This sets -x
+    source multibuild_customize.sh
+    echo $ENABLE_CONTRIB > contrib.enabled
+    echo $ENABLE_HEADLESS > headless.enabled
+    
+    if [ -n "$IS_OSX" ]; then
+        TAPS="$(brew --repository)/Library/Taps"
+        if [ -e "$TAPS/caskroom/homebrew-cask" -a -e "$TAPS/homebrew/homebrew-cask" ]; then
+            rm -rf "$TAPS/caskroom/homebrew-cask"
+        fi
+        find "$TAPS" -type d -name .git -exec \
+                bash -xec '
+                    cd $(dirname '\''{}'\'')
+                    git clean -fxd
+                    git status' \;
+                    
+        brew_cache_cleanup
+    fi
+    
+    before_install
+    # Not interested in travis internal scripts' output
+    set +x
+
 install: |
   # Build and package
   set -x
   build_wheel $REPO_DIR $PLAT
   if [ -n "$USE_CCACHE" ]; then ccache --show-stats; fi
   set +x
+
 script: |
   # Install and run tests
   set -x
@@ -83,46 +113,26 @@ script: |
   trap ERR
 
   test "$rc" -eq 0
-before_cache: "# Cleanup dirs to be cached\nset -x\nif [ -n \"$IS_OSX\" ]; then\n\n
-  \   # When Taps is cached, this dir causes \"Error: file exists\" on `brew update`\n
-  \   if [ -e \"$(brew --repository)/Library/Taps/homebrew/homebrew-cask/homebrew-cask\"
-  ]; then\n        rm -rf \"$(brew --repository)/Library/Taps/homebrew/homebrew-cask/homebrew-cask\"\n
-  \   fi\n\n    brew_cache_cleanup\n    \nfi\nset +x\n"
-after_success: |
-  # Upload wheels to pypi if requested
-  if [ -n "$TRAVIS_TAG" ]; then
-      set -x
-      pip install twine
 
-      if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-        pip install --upgrade pyOpenSSL
-      fi
+before_cache: |
+    # Cleanup dirs to be cached
+    set -x
+    if [ -n "$IS_OSX" ]; then
+        # When Taps is cached, this dir causes "Error: file exists" on `brew update`
+        if [ -e "$(brew --repository)/Library/Taps/homebrew/homebrew-cask/homebrew-cask" ]; then
+            rm -rf "$(brew --repository)/Library/Taps/homebrew/homebrew-cask/homebrew-cask"
+        fi
+        brew_cache_cleanup
+        
+    fi
+    set +x
 
-      if [[ $ENABLE_CONTRIB == 0 ]]; then
-          if [[ $ENABLE_HEADLESS == 0 ]]; then
-            echo "This is default build. Deployment will be done to to PyPI entry opencv-python."
-          else
-            echo "This is headless contrib build. Deployment will be done to to PyPI entry opencv-python-headless."
-          fi
-      else
-          if [[ $ENABLE_HEADLESS == 0 ]]; then
-            echo "This is contrib build. Deployment will be done to to PyPI entry opencv-contrib-python."
-          else
-            echo "This is headless contrib build. Deployment will be done to to PyPI entry opencv-contrib-python-headless."
-          fi
-      fi
-
-      #twine upload -u ${USER} -p ${PASS} --skip-existing ${TRAVIS_BUILD_DIR}/wheelhouse/opencv*
-      set +x
-  else
-      echo "Tag not set, deployment skipped."
-  fi
 deploy:
   provider: releases
   api_key:
     secure: AtM2g/4gJz2ZR4z6+p9GOkUiBIQGKgpJvkq48CgAeTTjEX0CXxn5XSwat4U8Sxr2QEiWj7giRsZlwW8P5TyPXAZ/R7oy1/hsfHQPpz9PKfrKFRpchgWdqiKfyTJwcTcEgo5VIhWmsnvXhbaQZPRnvAhvZ0b3wHfx/ymbsoyD1oyLJMDWq+K8bPvXni+A+vzv+PsSM4kF+AscjSO3ntVs6lBu7PiXFuz9vmmUY7jDkty3GmPzKA1wav1WNvWklSfiiIZvtGU2wj9iUClhYMibzY9lH4fowG9R2m6L3NjtefFCS17XhANKh6iEm3jVVifMjRvThCuYorEC67HDK3RLVJgwGhGWC5Jbr4Xc7aFTgd7lIftHL/alNcmLmiOpGcle45Uc1sdih1e0r5kkoszUAH+QNBXlN10ayNIP/z8iLv6LgT0qj0RIxvqleAJKawohhPqIPNVeSd+v+Vn7l7zbiYtiiZy03a94nvh1IbXPi6p2QB2uGy1/+3B9eipPiA9yamQh5dx2qP4j30iFUh4kMU2KIPfu2w6es+P5/TCVEebZwD1KqERBlKOCAW4g5EGg4qO2AXKN7as7VBge6KITSUSJogc5GhMgyd0tclON60vLeLpEyVv/C2Sq24WDuS8uy9IFm0vs1pzkCmBxEpFxvOyh20eWkVIpOfVPs27U/l0=
   file_glob: true
-  file: "${TRAVIS_BUILD_DIR}/wheelhouse/opencv/*"
+  file: "${TRAVIS_BUILD_DIR}/dist"
   on:
     repo: Swind/opencv-python
     tags: true
