@@ -133,6 +133,7 @@ deploy:
     secure: AtM2g/4gJz2ZR4z6+p9GOkUiBIQGKgpJvkq48CgAeTTjEX0CXxn5XSwat4U8Sxr2QEiWj7giRsZlwW8P5TyPXAZ/R7oy1/hsfHQPpz9PKfrKFRpchgWdqiKfyTJwcTcEgo5VIhWmsnvXhbaQZPRnvAhvZ0b3wHfx/ymbsoyD1oyLJMDWq+K8bPvXni+A+vzv+PsSM4kF+AscjSO3ntVs6lBu7PiXFuz9vmmUY7jDkty3GmPzKA1wav1WNvWklSfiiIZvtGU2wj9iUClhYMibzY9lH4fowG9R2m6L3NjtefFCS17XhANKh6iEm3jVVifMjRvThCuYorEC67HDK3RLVJgwGhGWC5Jbr4Xc7aFTgd7lIftHL/alNcmLmiOpGcle45Uc1sdih1e0r5kkoszUAH+QNBXlN10ayNIP/z8iLv6LgT0qj0RIxvqleAJKawohhPqIPNVeSd+v+Vn7l7zbiYtiiZy03a94nvh1IbXPi6p2QB2uGy1/+3B9eipPiA9yamQh5dx2qP4j30iFUh4kMU2KIPfu2w6es+P5/TCVEebZwD1KqERBlKOCAW4g5EGg4qO2AXKN7as7VBge6KITSUSJogc5GhMgyd0tclON60vLeLpEyVv/C2Sq24WDuS8uy9IFm0vs1pzkCmBxEpFxvOyh20eWkVIpOfVPs27U/l0=
   file_glob: true
   file: "${TRAVIS_BUILD_DIR}/dist"
+  skip_cleanup: true
   on:
     repo: Swind/opencv-python
     tags: true
