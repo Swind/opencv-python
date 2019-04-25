@@ -23,34 +23,25 @@ matrix:
   include:
   - os: linux
     env:
-    - MB_PYTHON_VERSION=3.5
-    - ENABLE_CONTRIB=1
-    - ENABLE_HEADLESS=0
+      - MB_PYTHON_VERSION=3.5
+      - ENABLE_CONTRIB=1
+      - ENABLE_HEADLESS=0
     cache:
       directories: "$HOME/.ccache"
   - os: linux
     env:
-    - MB_PYTHON_VERSION=3.5
-    - PLAT=i686
-    - ENABLE_CONTRIB=1
-    - ENABLE_HEADLESS=0
+      - MB_PYTHON_VERSION=3.6
+      - TEST_DEPENDS=numpy==1.11.3
+      - ENABLE_CONTRIB=1
+      - ENABLE_HEADLESS=0
     cache:
       directories: "$HOME/.ccache"
   - os: linux
     env:
-    - MB_PYTHON_VERSION=3.6
-    - TEST_DEPENDS=numpy==1.11.3
-    - ENABLE_CONTRIB=1
-    - ENABLE_HEADLESS=0
-    cache:
-      directories: "$HOME/.ccache"
-  - os: linux
-    env:
-    - MB_PYTHON_VERSION=3.6
-    - PLAT=i686
-    - TEST_DEPENDS=numpy==1.11.3
-    - ENABLE_CONTRIB=1
-    - ENABLE_HEADLESS=0
+      - MB_PYTHON_VERSION=3.7
+      - TEST_DEPENDS=numpy==1.14.5
+      - ENABLE_CONTRIB=1
+      - ENABLE_HEADLESS=0
     cache:
       directories: "$HOME/.ccache"
 
